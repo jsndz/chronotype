@@ -1,6 +1,7 @@
 const editor = document.getElementById("typing-area");
 const start = document.getElementById("start-btn");
 const speed = document.getElementById("speed");
+const showSave = document.getElementById("save");
 class Session {
   constructor() {
     this.startTime = null;
@@ -54,21 +55,42 @@ function throttle(fn, limit) {
     }
   };
 }
+const debouncedSave = debounce(() => {
+  console.log("Auto-saving session to LocalStorage...");
+  localStorage.setItem("chrono_session", JSON.stringify(session));
+  throttledSave();
+}, 5000);
+
+const throttledInput = throttle((value) => {
+  session.type(value);
+}, 50);
+
+const throttledSave = throttle(() => {
+  showSave.innerText = "saved";
+}, 1000);
+
+function save() {
+  debouncedSave();
+}
 
 start.addEventListener("click", (ev) => {
   play();
 });
 
 editor.addEventListener("input", (ev) => {
+  showSave.innerText = "";
   session.start();
-  session.type(ev.target.value);
+  throttledInput(ev.target.value);
+  save();
 });
 
 function play() {
   editor.value = "";
   session.events.forEach((ev) => {
+    const playbackSpeed = Number(speed.value);
+
     setTimeout(() => {
       editor.value = ev.value;
-    }, (ev.offset /speed.value));
+    }, ev.offset / playbackSpeed);
   });
 }
