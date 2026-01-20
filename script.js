@@ -1,5 +1,6 @@
 const editor = document.getElementById("typing-area");
 const start = document.getElementById("start-btn");
+const speed = document.getElementById("speed");
 class Session {
   constructor() {
     this.startTime = null;
@@ -68,6 +69,6 @@ function play() {
   session.events.forEach((ev) => {
     setTimeout(() => {
       editor.value = ev.value;
-    }, ev.offset);
+    }, (ev.offset /speed.value));
   });
 }
